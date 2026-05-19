@@ -1,301 +1,579 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRA_EDITZ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>GRA_EDITZ | Cinematic Video Editor</title>
+  <!-- Fonts: Orbitron for logo, Poppins for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+    body {
+      background-color: #0a0a0c;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    /* Cinematic background with blurred image and moving glow blobs */
+    .bg-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect width="1920" height="1080" fill="%23050505"/><defs><filter id="blur"><feGaussianBlur stdDeviation="150"/></filter></defs><circle cx="300" cy="200" r="400" fill="%2300e5ff" opacity="0.08" filter="url(%23blur)"/><circle cx="1600" cy="800" r="450" fill="%23ff6b2b" opacity="0.07" filter="url(%23blur)"/></svg>');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
 
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    /* Floating animated blobs */
+    .glow-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+    .blob-left {
+      width: 60vw;
+      height: 60vw;
+      max-width: 800px;
+      max-height: 800px;
+      background: #00e5ff;
+      top: -10%;
+      left: -15%;
+      animation: slowBlobLeft 18s infinite alternate ease-in-out;
+    }
+    .blob-right {
+      width: 55vw;
+      height: 55vw;
+      max-width: 700px;
+      max-height: 700px;
+      background: #ff6b2b;
+      bottom: -10%;
+      right: -10%;
+      animation: slowBlobRight 20s infinite alternate ease-in-out;
+    }
 
+    @keyframes slowBlobLeft {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(8%, 5%) scale(1.1); }
+    }
+    @keyframes slowBlobRight {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-7%, -6%) scale(1.08); }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Typography */
+    h1, h2, h3 {
+      font-weight: 600;
+    }
+    .logo-font {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    /* Glassmorphism card */
+    .glass-card {
+      background: rgba(20, 20, 24, 0.5);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      border-color: rgba(0, 229, 255, 0.25);
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.15);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 2.2rem;
+      border-radius: 3rem;
+      font-weight: 500;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      transition: 0.3s ease;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00e5ff, #ff6b2b);
+      box-shadow: 0 8px 22px rgba(0, 229, 255, 0.3);
+      color: #0a0a0c;
+      font-weight: 600;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 12px 28px rgba(255, 107, 43, 0.5);
+      transform: translateY(-2px);
+    }
+    .btn-glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+    }
+    .btn-glass:hover {
+      background: rgba(0, 229, 255, 0.1);
+      border-color: #00e5ff;
+      box-shadow: 0 0 20px rgba(0,229,255,0.3);
+    }
+
+    /* Hero section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 0;
+    }
+    .hero-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3rem;
+      width: 100%;
+    }
+    .hero-left {
+      flex: 1 1 280px;
+      display: flex;
+      justify-content: center;
+    }
+    .profile-pic {
+      width: 260px;
+      height: 260px;
+      max-width: 70vw;
+      max-height: 70vw;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(0, 229, 255, 0.5);
+      box-shadow: 0 0 50px rgba(0, 229, 255, 0.4);
+      animation: floatProfile 5s infinite ease-in-out;
+      background: #1e1e24;
+    }
+    @keyframes floatProfile {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .hero-right {
+      flex: 1 1 400px;
+      text-align: left;
+    }
+    .brand-name {
+      font-size: clamp(3rem, 10vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      background: linear-gradient(to right, #fff, #ccc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .tagline {
+      font-size: 1.5rem;
+      font-weight: 300;
+      margin-top: 0.5rem;
+      position: relative;
+      display: inline-block;
+    }
+    .tagline::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #00e5ff, #ff6b2b);
+      box-shadow: 0 0 15px #00e5ff;
+    }
+    .hero-buttons {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    }
+
+    /* Section titles */
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 2.5rem;
+      letter-spacing: 1px;
+      position: relative;
+      display: inline-block;
+    }
+    .section-title span {
+      background: linear-gradient(135deg, #00e5ff, #ff6b2b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Showreel frame */
+    .showreel-frame {
+      border-radius: 1.8rem;
+      padding: 10px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      box-shadow: 0 0 35px rgba(0, 229, 255, 0.2);
+      transition: 0.4s;
+    }
+    .showreel-frame:hover {
+      box-shadow: 0 0 55px rgba(255, 107, 43, 0.5);
+      border-color: #ff6b2b;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 1.2rem;
+      background: #000;
+    }
+
+    /* Featured grid */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .video-card {
+      background: rgba(18, 18, 22, 0.6);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .video-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.35);
+      border-color: #ff6b2b;
+    }
+    .video-card video {
+      border-radius: 1rem;
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+    .video-title {
+      font-weight: 600;
+      margin: 0.8rem 0 0.3rem;
+      font-size: 1.3rem;
+    }
+    .video-desc {
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+
+    /* Shorts/Reels section - special layout */
+    .shorts-layout {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .shorts-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      flex: 1;
+      min-width: 100px;
+    }
+    .short-item {
+      aspect-ratio: 9 / 16;
+      max-height: 280px;
+      width: 100%;
+      border-radius: 1.2rem;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: 0.3s;
+    }
+    .short-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 1.2rem;
+    }
+    .center-main-video {
+      flex: 2;
+      min-width: 300px;
+      max-width: 600px;
+      aspect-ratio: 16/9;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      border: 2px solid rgba(0, 229, 255, 0.5);
+      box-shadow: 0 0 40px rgba(0,229,255,0.3);
+    }
+    .center-main-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* About & Contact */
+    .about-text {
+      font-size: 1.3rem;
+      max-width: 800px;
+      margin: 0 auto;
+      font-weight: 300;
+      text-align: center;
+      background: rgba(0,0,0,0.4);
+      padding: 2rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(10px);
+    }
+    .contact-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+    .contact-item {
+      padding: 1.8rem 2.5rem;
+      text-align: center;
+      min-width: 220px;
+    }
+    .cta-section {
+      text-align: center;
+      padding: 4rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .hero-grid {
+        flex-direction: column;
+        text-align: center;
+      }
+      .hero-right {
+        text-align: center;
+      }
+      .shorts-layout {
+        flex-direction: column;
+      }
+      .shorts-column {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .short-item {
+        width: 30%;
+        min-width: 90px;
+        aspect-ratio: 9/16;
+      }
+      .center-main-video {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="bg-layer"></div>
+  <div class="glow-blob blob-left"></div>
+  <div class="glow-blob blob-right"></div>
 
-    <!-- Background Overlay -->
-    <div class="bg-overlay"></div>
-
-
-    <!-- ================= HERO SECTION ================= -->
+  <main class="container">
+    <!-- HERO -->
     <section class="hero">
-
-        <!-- LEFT -->
+      <div class="hero-grid">
         <div class="hero-left">
-
-            <div class="dp-ring">
-                <img src="images/dp.png" alt="Profile Picture" class="dp">
-            </div>
-
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23222' stroke='%2300e5ff' stroke-width='2'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='16' font-family='Poppins'%3EGRA%3C/text%3E%3C/svg%3E" alt="GRA_EDITZ Profile" class="profile-pic">
         </div>
-
-
-        <!-- RIGHT -->
         <div class="hero-right">
-
-            <h1 class="main-logo">
-                GRA_EDITZ
-            </h1>
-
-            <h2 class="tagline">
-                Turning Ideas Into Motion
-            </h2>
-
-            <button class="showreel-btn">
-                ▶ Watch Showreel
-            </button>
-
+          <h1 class="brand-name logo-font">GRA_EDITZ</h1>
+          <p class="tagline">Turning Ideas Into Motion</p>
+          <div class="hero-buttons">
+            <a href="https://wa.me/923143576406" target="_blank" class="btn btn-primary">Hire Me</a>
+            <a href="#showreel" class="btn btn-glass">▶ Watch Showreel</a>
+          </div>
         </div>
-
+      </div>
     </section>
 
-
-
-    <!-- ================= SKILLS ================= -->
-    <section class="skills-section">
-
-        <div class="skills-track">
-
-            <span>Premiere Pro</span>
-            <span>After Effects</span>
-            <span>Motion Graphics</span>
-            <span>Short Form Content</span>
-            <span>Color Grading</span>
-            <span>Cinematic Editing</span>
-            <span>YouTube Editing</span>
-            <span>Commercial Ads</span>
-
-        </div>
-
+    <!-- SHOWREEL -->
+    <section id="showreel" style="margin: 5rem 0;">
+      <h2 class="section-title"><span>Showreel</span></h2>
+      <div class="showreel-frame">
+        <video muted loop playsinline controls preload="metadata" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450' fill='%23111'%3E%3Crect width='800' height='450'/%3E%3Ctext x='400' y='235' text-anchor='middle' fill='%23555' font-size='24'%3EShowreel%3C/text%3E%3C/svg%3E">
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-connection-1688-large.mp4" type="video/mp4">
+        </video>
+      </div>
     </section>
 
-
-
-
-    <!-- ================= PORTFOLIO ================= -->
-    <section class="portfolio">
-
-        <h2 class="section-title">
-            Featured Work
-        </h2>
-
-
-        <div class="video-grid">
-
-
-            <!-- VIDEO 1 -->
-            <div class="video-card">
-
-                <video controls muted>
-                    <source src="videos/video1.mp4">
-                </video>
-
-                <h3>YouTube Shorts</h3>
-
-            </div>
-
-
-
-            <!-- VIDEO 2 -->
-            <div class="video-card">
-
-                <video controls muted>
-                    <source src="videos/video2.mp4">
-                </video>
-
-                <h3>Cinematic Edit</h3>
-
-            </div>
-
-
-
-            <!-- VIDEO 3 -->
-            <div class="video-card">
-
-                <video controls muted>
-                    <source src="videos/video3.mp4">
-                </video>
-
-                <h3>Motion Graphics</h3>
-
-            </div>
-
-
-
-
-            <!-- VIDEO 4 -->
-            <div class="video-card">
-
-                <video controls muted>
-                    <source src="videos/video4.mp4">
-                </video>
-
-                <h3>Social Media Ad</h3>
-
-            </div>
-
-
-
-
-            <!-- VIDEO 5 -->
-            <div class="video-card">
-
-                <video controls muted>
-                    <source src="videos/video5.mp4">
-                </video>
-
-                <h3>Reels Editing</h3>
-
-            </div>
-
-
-
-
-            <!-- VIDEO 6 -->
-            <div class="video-card">
-
-                <video controls muted>
-                    <source src="videos/video6.mp4">
-                </video>
-
-                <h3>Documentary Style</h3>
-
-            </div>
-
-
+    <!-- FEATURED VIDEOS -->
+    <section style="margin: 5rem 0;">
+      <h2 class="section-title"><span>Featured Work</span></h2>
+      <div class="video-grid">
+        <div class="video-card">
+          <video muted loop playsinline preload="metadata" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='225' fill='%23111'%3E%3Ctext x='200' y='120' text-anchor='middle' fill='%23555'%3ECinematic%3C/text%3E%3C/svg%3E">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4" type="video/mp4">
+          </video>
+          <div class="video-title">Urban Drift</div>
+          <div class="video-desc">Cinematic color grade & rhythm.</div>
         </div>
-
+        <div class="video-card">
+          <video muted loop playsinline preload="metadata" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='225' fill='%23111'%3E%3Ctext x='200' y='120' text-anchor='middle' fill='%23555'%3EMotion%3C/text%3E%3C/svg%3E">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4" type="video/mp4">
+          </video>
+          <div class="video-title">Liquid Motion</div>
+          <div class="video-desc">Experimental transitions.</div>
+        </div>
+        <div class="video-card">
+          <video muted loop playsinline preload="metadata" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='225' fill='%23111'%3E%3Ctext x='200' y='120' text-anchor='middle' fill='%23555'%3ENeon%3C/text%3E%3C/svg%3E">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5016-large.mp4" type="video/mp4">
+          </video>
+          <div class="video-title">Neon Nights</div>
+          <div class="video-desc">Cyberpunk aesthetic reel.</div>
+        </div>
+      </div>
     </section>
 
-
-
-
-
-
-    <!-- ================= STATS ================= -->
-    <section class="stats-section">
-
-
-        <div class="stat-box">
-
-            <h2 class="counter" data-target="80">
-                0
-            </h2>
-
-            <p>Projects</p>
-
+    <!-- SHORTS / REELS SECTION with fixed frame -->
+    <section style="margin: 5rem 0;">
+      <h2 class="section-title"><span>Shorts & Reels</span></h2>
+      <div class="shorts-layout">
+        <div class="shorts-column">
+          <div class="short-item"><video muted loop playsinline preload="metadata" src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-1232-large.mp4"></video></div>
+          <div class="short-item"><video muted loop playsinline preload="metadata" src="https://assets.mixkit.co/videos/preview/mixkit-woman-talking-on-a-video-call-4227-large.mp4"></video></div>
+          <div class="short-item"><video muted loop playsinline preload="metadata" src="https://assets.mixkit.co/videos/preview/mixkit-closeup-of-a-woman-with-colorful-makeup-39821-large.mp4"></video></div>
         </div>
-
-
-
-        <div class="stat-box">
-
-            <h2 class="counter" data-target="3">
-                0
-            </h2>
-
-            <p>Years Experience</p>
-
+        <div class="center-main-video">
+          <video muted loop playsinline controls preload="metadata" src="https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-connection-1688-large.mp4"></video>
         </div>
-
-
-
-
-        <div class="stat-box">
-
-            <h2 class="counter" data-target="100">
-                0
-            </h2>
-
-            <p>Passion</p>
-
+        <div class="shorts-column">
+          <div class="short-item"><video muted loop playsinline preload="metadata" src="https://assets.mixkit.co/videos/preview/mixkit-waves-coming-to-the-beach-5016-large.mp4"></video></div>
+          <div class="short-item"><video muted loop playsinline preload="metadata" src="https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-flowers-1173-large.mp4"></video></div>
+          <div class="short-item"><video muted loop playsinline preload="metadata" src="https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4"></video></div>
         </div>
-
-
+      </div>
     </section>
 
-
-
-
-
-
-
-    <!-- ================= ABOUT ================= -->
-    <section class="about-section">
-
-        <h2 class="section-title">
-            About Me
-        </h2>
-
-
-        <p class="about-text">
-
-            I’m living my dream by doing what I love most—
-            transforming raw ideas into visually powerful
-            stories through creativity, precision,
-            and cinematic motion.
-
-        </p>
-
-
+    <!-- ABOUT -->
+    <section style="margin: 5rem 0;">
+      <h2 class="section-title"><span>About</span></h2>
+      <div class="about-text glass-card">
+        “I’m fortunate to turn creativity into my profession — crafting motion-driven visuals that transform ideas into engaging digital experiences.”
+      </div>
     </section>
 
-
-
-
-
-
-
-    <!-- ================= CONTACT ================= -->
-    <section class="contact-section">
-
-        <h2 class="section-title">
-            Contact
-        </h2>
-
-
-
-        <div class="contact-box">
-
-            <p>
-                WhatsApp :
-                0314 3576406
-            </p>
-
-
-            <p>
-                Email :
-                graeditz02600@gmail.com
-            </p>
-
+    <!-- CONTACT -->
+    <section id="contact" style="margin: 5rem 0;">
+      <h2 class="section-title"><span>Contact</span></h2>
+      <div class="contact-cards">
+        <div class="glass-card contact-item">
+          <p style="font-weight:300; margin-bottom:0.5rem;">WhatsApp</p>
+          <a href="https://wa.me/923143576406" target="_blank" style="color:#00e5ff; text-decoration:none; font-weight:600;">0314 3576406</a>
         </div>
-
-
+        <div class="glass-card contact-item">
+          <p style="font-weight:300; margin-bottom:0.5rem;">Email</p>
+          <a href="mailto:graeditz02600@gmail.com" style="color:#ff6b2b; text-decoration:none; font-weight:600;">graeditz02600@gmail.com</a>
+        </div>
+      </div>
     </section>
 
+    <!-- FINAL CTA -->
+    <section class="cta-section">
+      <h2 style="font-size:2.2rem; font-weight:500;">Let’s Create Something Cinematic Together</h2>
+      <p style="margin:1.2rem 0 2rem; color:#ccc;">Freelance availability for motion design & editing.</p>
+      <a href="https://wa.me/923143576406" target="_blank" class="btn btn-primary" style="font-size:1.2rem; padding:1rem 3rem;">Hire Me</a>
+    </section>
+  </main>
 
+  <script>
+    (function() {
+      // Hover play/pause for all videos
+      const videos = document.querySelectorAll('video');
+      videos.forEach(video => {
+        video.addEventListener('mouseenter', function() {
+          if (video.paused) {
+            video.play().catch(() => {});
+          }
+        });
+        video.addEventListener('mouseleave', function() {
+          if (!video.paused) {
+            video.pause();
+          }
+        });
+        // Ensure muted for autoplay capability
+        video.muted = true;
+      });
 
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const href = this.getAttribute('href');
+          if (href === "#") return;
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
 
+      // Subtle reveal animation on scroll (very light)
+      const revealElements = document.querySelectorAll('.glass-card, .showreel-frame, .video-card, .short-item, .center-main-video');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = 1;
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, { threshold: 0.15 });
 
+      revealElements.forEach(el => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateY(15px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+      });
 
-
-
-    <!-- ================= FOOTER ================= -->
-    <footer>
-
-        Crafted By GRA_EDITZ © 2026
-
-    </footer>
-
-
-
-
-    <!-- JAVASCRIPT -->
-    <script src="script.js"></script>
-
+      // Initial trigger for visible elements
+      window.addEventListener('load', () => {
+        revealElements.forEach(el => {
+          if (el.getBoundingClientRect().top < window.innerHeight) {
+            el.style.opacity = 1;
+            el.style.transform = 'translateY(0)';
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
+```
